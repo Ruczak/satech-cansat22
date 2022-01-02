@@ -1,21 +1,21 @@
-from threading import Thread
-import time
+import asyncio
 
-class EventBus:
-    def __init__(self, thread ):
-        self.__serviceThread = thread
-        self.__queue = []
-        pass
+class EventBus():
+    def __init__(self):
+        self.listeners = {}
 
-    # adds element to the queue (at the end)
-    def add(self, event):
-        self.__queue.append(event)
-        self.__sendToServices(event)
+    def addListener(self, name, listener):
+        if not self.listeners.get(name, None):
+            self.listeners[name] = {listener}
+        else:
+            self.listeners[name].add(listener)
 
-    # removes first element from the queue
-    def remove(self, index):
-        self.queue.pop(0)
-    
-    # private: sends an event signal to all of services
-    def __sendToServices(event):
-        pass
+    def removeListener(self, name, listener):
+        self.listeners[name].remove(listener)
+        if len(self.listeners[name]) == 0:
+            del self.listeners[name]
+
+    def emit(self, name, event):
+        listeners = self.listeners.get(name, [])
+        for listener in listeners:
+            asyncio.create_task(listener(event))
