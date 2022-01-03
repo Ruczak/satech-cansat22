@@ -3,7 +3,7 @@ import os
 import csv
 
 class FileService(Service):
-    def __init__(self, name, scope):
+    def __init__(self, name: str, scope: str) -> None:
         super(FileService, self).__init__(name)
         if isinstance(scope, str) and len(scope) > 0:
             os.chdir(scope)
@@ -12,16 +12,16 @@ class FileService(Service):
             self.__scope = os.getcwd()
         
     @property
-    def scope(self):
+    def scope(self) -> str:
         return self.__scope
 
     @scope.setter
-    def scope(self, path):
+    def scope(self, path: str) -> None:
         if isinstance(path, str) and len(path) > 0:
             os.chdir(path)
             self.__scope = path
 
-    def addToCsv(path, data, delimiter='|'):
+    def addToCsv(self, path: str, data: list[dict], delimiter: str = '|') -> None:
         writeHeader = not os.path.isfile(path) or os.stat(path).st_size == 0
         with open(path, newline='') as file:
             fields = data[0].keys()
@@ -32,4 +32,6 @@ class FileService(Service):
 
             for row in data:
                 writer.writerow(row)
+
+    
 
