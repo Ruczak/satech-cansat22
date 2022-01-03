@@ -1,6 +1,9 @@
-from _Service import Service
+from ._Service import Service
+from EventBus import EventBus
+from Events.UpdateCsvEvent import UpdateCsvEvent
 import os
 import csv
+
 
 class FileService(Service):
     def __init__(self, name: str, scope: str) -> None:
@@ -10,7 +13,8 @@ class FileService(Service):
             self.__scope = scope
         else:
             self.__scope = os.getcwd()
-        
+    
+
     @property
     def scope(self) -> str:
         return self.__scope
@@ -23,15 +27,18 @@ class FileService(Service):
 
     def addToCsv(self, path: str, data: list[dict], delimiter: str = '|') -> None:
         writeHeader = not os.path.isfile(path) or os.stat(path).st_size == 0
-        with open(path, newline='') as file:
+
+        with open(path, 'a', newline='') as file:
             fields = data[0].keys()
-            writer = csv.DictWriter(file, delimiter, quotechar="\'", quoting=csv.QUOTE_MINIMAL, fieldnames=fields)
+            writer = csv.DictWriter(file, delimiter=delimiter, quotechar="\'", quoting=csv.QUOTE_MINIMAL, fieldnames=fields)
 
             if writeHeader:
                 writer.writeheader()
 
             for row in data:
                 writer.writerow(row)
+
+            file.close()
 
     
 
