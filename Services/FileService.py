@@ -14,7 +14,7 @@ class FileService(Service):
         else:
             self.__scope = os.getcwd()
     
-
+    # defines the scope of the file system, uses current scope as a context
     @property
     def scope(self) -> str:
         return self.__scope
@@ -25,6 +25,7 @@ class FileService(Service):
             os.chdir(path)
             self.__scope = path
 
+    # adds data rows to .csv file specified with path
     def addToCsv(self, path: str, data: list[dict], delimiter: str = '|') -> None:
         writeHeader = not os.path.isfile(path) or os.stat(path).st_size == 0
 
