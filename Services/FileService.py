@@ -9,6 +9,9 @@ class FileService(Service):
     def __init__(self, name: str, scope: str) -> None:
         super(FileService, self).__init__(name)
         if isinstance(scope, str) and len(scope) > 0:
+            if not os.path.isdir(scope):
+                os.mkdir(scope)
+            
             os.chdir(scope)
             self.__scope = scope
         else:
