@@ -13,14 +13,12 @@ import random
 def getRandomValue(min, max):
     return random.random() * max + min
 
-async def readPressureAndTemp(eventBus):
+async def readPressureAndTemp(eventBus: EventBus):
     while True:
         await asyncio.sleep(1)
-        temp = getRandomValue(0, 50)
-        pressure = getRandomValue(900, 1020)
-        timestamp = time.time()
-        updateEvent = UpdateCsvEvent('atmData.csv', [{'timestamp': time, 'temp': temp, 'pressure': pressure}])
-        sendEvent = SendCsvEvent(30, 868, [{'timestamp': time, 'temp': temp, 'pressure': pressure}])
+        data = [{'timestamp': time.time(), 'temp': getRandomValue(-20, 50), 'pressure': getRandomValue(900, 1020)}]
+        updateEvent = UpdateCsvEvent('atmData.csv', data)
+        sendEvent = SendCsvEvent(0, 868, data)
         eventBus.emit('saveTempAndPressure', updateEvent)
         eventBus.emit('sendTempAndPressure', sendEvent)
 
@@ -37,7 +35,7 @@ def main():
 
     async def sendHandler(e: SendCsvEvent):
         commService.send(e.address, e.freq, e.data)
-        print(f"Sent data to address of 30 (frequency: 868M), {e.data}")
+        print(f"Sent data to address of ({e.address}, {e.freq}M), {e.data}")
         
 
     eventBus.addListener('saveTempAndPressure', updateHandler)

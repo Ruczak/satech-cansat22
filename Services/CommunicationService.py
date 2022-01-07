@@ -1,20 +1,11 @@
-from _sx126x import sx126x
+from Misc.sx126x import sx126x
 from ._Service import Service
 import io, csv
 
 class CommunicationService(Service, sx126x):
     def __init__(self, name: str, address: int):
-        super(sx126x, self).__init__(serial_num = "/dev/ttyS0",freq=868, addr=address, power=22, rssi=True, air_speed=2400, relay=False)
-        super(Service, self).__init__(name)
-        # self.__csvSchema: list = csvSchema
-
-    # @property
-    # def csvSchema(self):
-    #     return self.__csvSchema
-    
-    # @csvSchema.setter
-    # def csvSchema(self, value):
-    #     self.__csvSchema = value
+        sx126x.__init__(self, serial_num = "/dev/ttyS0",freq=868, addr=address, power=22, rssi=True, air_speed=2400, relay=False)
+        Service.__init__(self, name)
 
     def send(self, address: int, freq: int, rows: list[dict], delimiter: str = '|'):
         fields = rows[0].keys()
@@ -30,4 +21,4 @@ class CommunicationService(Service, sx126x):
         #         high 8bit address           low 8bit address                    frequency                address                 address                  frequency             message payload
         data = bytes([int(address)>>8]) + bytes([int(address)&0xff]) + bytes([offset_frequence]) + bytes([self.addr>>8]) + bytes([self.addr&0xff]) + bytes([self.offset_freq]) + buffer.getvalue().encode()
 
-        super(sx126x, self).send(data)
+        sx126x.send(self, data)
