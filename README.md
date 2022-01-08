@@ -1,4 +1,4 @@
-# Satech Cansat
+# SaTech Cansat
 ### Edition 2021/22
 <img src="https://drive.google.com/uc?export=view&id=1Y8iNRtcaDI3GDSQ605UacmiUN2jqexMc" style="height: 300px; max-height: 100%; width: auto" /><br>
 ## Introduction
