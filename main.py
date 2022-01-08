@@ -18,9 +18,10 @@ async def readPressureAndTemp(eventBus: EventBus):
         await asyncio.sleep(1)
         data = [{'timestamp': time.time(), 'temp': getRandomValue(-20, 50), 'pressure': getRandomValue(900, 1020)}]
         updateEvent = UpdateCsvEvent('atmData.csv', data)
-        sendEvent = SendCsvEvent(0, 868, data)
+        sendEvent = SendCsvEvent(22, 868, data)
         eventBus.emit('saveTempAndPressure', updateEvent)
         eventBus.emit('sendTempAndPressure', sendEvent)
+    
 
 def main():
     loop = asyncio.get_event_loop()
@@ -42,13 +43,12 @@ def main():
     eventBus.addListener('sendTempAndPressure', sendHandler)
 
     try:
-        asyncio.ensure_future(readPressureAndTemp(eventBus))
-        loop.run_forever()
+        loop.run_until_complete(readPressureAndTemp(eventBus))
     except KeyboardInterrupt:
         pass
     finally:
-        print("Closed")
         loop.close()
+        print("Closed")
 
 
 if __name__ == '__main__':
