@@ -13,8 +13,8 @@
 ### I2C_2 (custom)
 - Vdd: 17 (3.3V)
 - GND: 20
-- SCL: 5 (GPIO3)
-- SDA: 3 (GPIO2)
+- SCL: 13 (GPIO27)
+- SDA: 11 (GPIO17)
 
 ## Sensors
 ### BMP280 Bosch:
