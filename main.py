@@ -33,6 +33,7 @@ def main():
         while True:
             await asyncio.sleep(1)
             data = [{'timestamp': time.time(), 'temp': sensService.getTemp(), 'pressure': sensService.getPressure()}]
+            #data = [{'timestamp': time.time(), 'temp': getRandomValue(-20, 40), 'pressure': sensService.getPressure()}]
             updateEvent = UpdateCsvEvent('atmData.csv', data)
             sendEvent = SendCsvEvent(22, 868, data)
             eventBus.emit('saveTempAndPressure', updateEvent)
