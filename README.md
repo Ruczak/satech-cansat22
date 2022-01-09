@@ -38,5 +38,5 @@ sudo apt-get upgrade
 9. Edit config file with:
    1. Type in terminal `sudo nano /boot/config.txt`
    2. Uncomment (delete # sign) or add this line `dtparam=i2c_arm=on`
-   3. Add this line `dtoverlay=i2c-gpio,bus=2,i2c_gpio_sda=27,i2c_gpio_scl=22`
+   3. Add this line `dtparam=i2c_vc=on`
 10. Reboot with `sudo reboot`

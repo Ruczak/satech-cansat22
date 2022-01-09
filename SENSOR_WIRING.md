@@ -6,19 +6,19 @@
 
 ## I<sup>2</sup>C Busses:
 
-### I2C_1 (default)
+### I2C_1
 
 - Vdd: 1 (3.3V)
 - GND: 6
 - SCL: 5 (GPIO3)
 - SDA: 3 (GPIO2)
 
-### I2C_2 (custom)
+### I2C_0
 
 - Vdd: 17 (3.3V)
-- GND: 20
-- SCL: 15 (GPIO22)
-- SDA: 13 (GPIO27)
+- GND: 30
+- SCL: 28 (ID_SC)
+- SDA: 27 (ID_SD)
 
 ## Sensors
 
@@ -30,6 +30,6 @@
 
 ### MCP9808 Adafruit:
 
-- Bus: I2C_2
+- Bus: I2C_0
 - Address: 0x18
 - Voltage: 3.3V
