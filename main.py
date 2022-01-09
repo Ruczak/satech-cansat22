@@ -1,9 +1,14 @@
 from Services.FileService import FileService
 from Services.CommunicationService import CommunicationService
+from Services.SensorService import SensorService
 from EventBus import EventBus
 
+from Events.Event import Event
 from Events.UpdateCsvEvent import UpdateCsvEvent
 from Events.SendCsvEvent import SendCsvEvent
+
+from smbus2 import SMBus
+from bmp280 import BMP280
 
 import os
 import asyncio
@@ -13,15 +18,6 @@ import random
 def getRandomValue(min, max):
     return random.random() * max + min
 
-async def readPressureAndTemp(eventBus: EventBus):
-    while True:
-        await asyncio.sleep(1)
-        data = [{'timestamp': time.time(), 'temp': getRandomValue(-20, 50), 'pressure': getRandomValue(900, 1020)}]
-        updateEvent = UpdateCsvEvent('atmData.csv', data)
-        sendEvent = SendCsvEvent(22, 868, data)
-        eventBus.emit('saveTempAndPressure', updateEvent)
-        eventBus.emit('sendTempAndPressure', sendEvent)
-    
 
 def main():
     loop = asyncio.get_event_loop()
@@ -29,6 +25,19 @@ def main():
     eventBus = EventBus()
     fileService = FileService('File Service', './.cache')
     commService = CommunicationService('Communication Service', 20)
+    sensService = SensorService('Sensor Service')
+
+    #sensor = BMP280(i2c_dev=SMBus(1))
+
+    async def readPressureAndTemp():
+        while True:
+            await asyncio.sleep(1)
+            data = [{'timestamp': time.time(), 'temp': sensService.getTemp(), 'pressure': sensService.getPressure()}]
+            updateEvent = UpdateCsvEvent('atmData.csv', data)
+            sendEvent = SendCsvEvent(22, 868, data)
+            eventBus.emit('saveTempAndPressure', updateEvent)
+            eventBus.emit('sendTempAndPressure', sendEvent)
+        
 
     async def updateHandler(e: UpdateCsvEvent):
         fileService.addToCsv(e.path, e.data)
@@ -38,12 +47,11 @@ def main():
         commService.send(e.address, e.freq, e.data)
         print(f"Sent data to address of ({e.address}, {e.freq}M), {e.data}")
         
-
     eventBus.addListener('saveTempAndPressure', updateHandler)
     eventBus.addListener('sendTempAndPressure', sendHandler)
 
     try:
-        loop.run_until_complete(readPressureAndTemp(eventBus))
+        loop.run_until_complete(readPressureAndTemp())
     except KeyboardInterrupt:
         pass
     finally:
