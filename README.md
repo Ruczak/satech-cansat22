@@ -22,7 +22,7 @@ sudo apt-get upgrade
 4. Make sure you have python3 installed `sudo python3`
 5. Install package installer for python (PIP) `sudo apt-get install python-pip`
 6. Install required dependencies `sudo apt-get install python-smbus python-serial`
-7. Install required python libraries `sudo python3 -m pip install RPi.GPIO csv`
+7. Install required python libraries `sudo python3 -m pip install RPi.GPIO csv smbus2 Adafruit_MCP9808`
 8. Open **Serial Port** and **I<sup>2</sup>C Port** with
    1. Type in terminal `sudo raspi-config`
    2. Select **Interface Options**
