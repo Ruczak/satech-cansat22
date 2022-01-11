@@ -40,16 +40,15 @@ sudo apt-get upgrade
    2. Uncomment (delete # sign) or add this line `dtparam=i2c_arm=on`
    3. Add this line `dtparam=i2c_vc=on`
 10. Install librtlsdr with
-   <pre>
-    git clone git://git.osmocom.org/rtl-sdr.git
-    cd rtl-sdr
-    mkdir build
-    cd build
-    cmake ../ -DINSTALL_UDEV_RULES=ON -DDETACH_KERNEL_DRIVER=ON
-    make
-    sudo make install
-    sudo ldconfig
-    cd ~
-    sudo cp ./rtl-sdr/rtl-sdr.rules /etc/udev/rules.d/
-   </pre>
+ <pre>
+git clone git://git.osmocom.org/rtl-sdr.git
+cd rtl-sdr
+mkdir build
+cd build
+cmake ../ -DINSTALL_UDEV_RULES=ON -DDETACH_KERNEL_DRIVER=ON
+make
+sudo make install
+sudo ldconfig
+cd ~
+sudo cp ./rtl-sdr/rtl-sdr.rules /etc/udev/rules.d/</pre>
 11. Reboot with `sudo reboot`
