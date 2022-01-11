@@ -1,6 +1,7 @@
 from Services.FileService import FileService
 from Services.CommunicationService import CommunicationService
 from Services.SensorService import SensorService
+from Services.SDRService import SDRService
 from EventBus import EventBus
 
 from Events.Event import Event
@@ -10,7 +11,7 @@ from Events.SendCsvEvent import SendCsvEvent
 from smbus2 import SMBus
 from bmp280 import BMP280
 
-import os
+import json
 import asyncio
 import time
 import random
@@ -22,14 +23,19 @@ def getRandomValue(min, max):
 def main():
     loop = asyncio.get_event_loop()
     
+
+
     eventBus = EventBus()
     fileService = FileService('File Service', './.cache')
     commService = CommunicationService('Communication Service', 20)
     sensService = SensorService('Sensor Service')
+    sdrService = SDRService("SDR Service")
 
     #sensor = BMP280(i2c_dev=SMBus(1))
 
     async def readPressureAndTemp():
+        sdrService.start("80M", "168M", "125k", "sdr_data.csv")
+
         while True:
             await asyncio.sleep(1)
             data = [{'timestamp': time.time(), 'temp': sensService.getTemp(), 'pressure': sensService.getPressure()}]
@@ -55,6 +61,7 @@ def main():
     except KeyboardInterrupt:
         pass
     finally:
+        sdrService.end()
         loop.close()
         print("Closed")
 
