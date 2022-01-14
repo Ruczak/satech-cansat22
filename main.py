@@ -23,15 +23,11 @@ def getRandomValue(min, max):
 def main():
     loop = asyncio.get_event_loop()
     
-
-
     eventBus = EventBus()
     fileService = FileService('File Service', './.cache')
     commService = CommunicationService('Communication Service', 20)
     sensService = SensorService('Sensor Service')
     sdrService = SDRService("SDR Service")
-
-    #sensor = BMP280(i2c_dev=SMBus(1))
 
     async def readPressureAndTemp():
         sdrService.start("80M", "168M", "125k", "sdr_data.csv")
