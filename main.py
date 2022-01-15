@@ -47,7 +47,7 @@ def main():
             eventBus.emit('sendTempAndPressure', sendEvent)
         
 
-    async def updateHandler(e: UpdateCsvEvent):
+    async def saveFileHandler(e: UpdateCsvEvent):
         fileService.addToCsv(e.path, e.data)
         print(f"Added data to csv ({e.path}, {e.data})")
 
@@ -55,7 +55,7 @@ def main():
         commService.send(e.address, e.freq, e.data)
         print(f"Sent data to address of ({e.address}, {e.freq} MHz), {e.data}")
         
-    eventBus.addListener('saveTempAndPressure', updateHandler)
+    eventBus.addListener('saveTempAndPressure', saveFileHandler)
     eventBus.addListener('sendTempAndPressure', sendHandler)
 
     try:
