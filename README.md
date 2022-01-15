@@ -52,3 +52,5 @@ sudo ldconfig
 cd ~
 sudo cp ./rtl-sdr/rtl-sdr.rules /etc/udev/rules.d/</pre>
 11. Reboot with `sudo reboot`
+12. Right before starting program, run `sudo stty -F /dev/ttyUSB0 9600`
+13. Run `sudo python3 main.py`
