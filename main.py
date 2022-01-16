@@ -36,7 +36,7 @@ def main():
             await asyncio.sleep(1)
 
     async def readPressureAndTemp():
-        sdrService.start("100M", "1000M", "125k", "sdr_data.csv")
+        sdrService.start("117975k", "950M", "125k", "sdr_data.csv")
 
         while True:
             await asyncio.sleep(1)
