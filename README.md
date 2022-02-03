@@ -21,8 +21,8 @@ sudo apt-get upgrade
 3. Copy repo with `git clone https://github.com/Ruczak/satech-cansat22.git`
 4. Make sure you have python3 installed `sudo python3`
 5. Install package installer for python (PIP) `sudo apt-get install python-pip`
-6. Install required dependencies `sudo apt-get install python-smbus python-serial`
-7. Install required python libraries `sudo python3 -m pip install RPi.GPIO csv`
+6. Install required dependencies `sudo apt-get install python-smbus python-serial libusb-1.0-0-dev cmake`
+7. Install required python libraries `sudo python3 -m pip install RPi.GPIO csv smbus2 Adafruit_MCP9808`
 8. Open **Serial Port** and **I<sup>2</sup>C Port** with
    1. Type in terminal `sudo raspi-config`
    2. Select **Interface Options**
@@ -39,4 +39,18 @@ sudo apt-get upgrade
    1. Type in terminal `sudo nano /boot/config.txt`
    2. Uncomment (delete # sign) or add this line `dtparam=i2c_arm=on`
    3. Add this line `dtparam=i2c_vc=on`
-10. Reboot with `sudo reboot`
+10. Install librtlsdr with
+ <pre>
+git clone git://git.osmocom.org/rtl-sdr.git
+cd rtl-sdr
+mkdir build
+cd build
+cmake ../ -DINSTALL_UDEV_RULES=ON -DDETACH_KERNEL_DRIVER=ON
+make
+sudo make install
+sudo ldconfig
+cd ~
+sudo cp ./rtl-sdr/rtl-sdr.rules /etc/udev/rules.d/</pre>
+11. Reboot with `sudo reboot`
+12. Right before starting program, run `sudo stty -F /dev/ttyUSB0 9600`
+13. Run `sudo python3 main.py`
