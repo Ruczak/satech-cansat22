@@ -28,7 +28,7 @@ def main():
     sensService = SensorService('Sensor Service')
     sdrService = SDRService("SDR Service")
     gpsService = GPSService("GPS Service")
-    recService = RecoveryService("Recovery Service", 21, delay=5)
+    recService = RecoveryService("Recovery Service", 26, 21, delay=5)
     recService.seaLvlPressure = 1010.00
 
     async def updateGPS():
@@ -38,12 +38,12 @@ def main():
 
     async def readPressureAndTemp():
         sdrService.start("117975k", "950M", "125k", "sdr_data.csv")
-
+        recService.ledStart()
         while True:
             await asyncio.sleep(1)
             pressure = sensService.getPressure()
-            #pressure = random.randint(800, 1010)            
-            data = [{'timestamp': time.time(), 'temp': sensService.getTemp(), 'pressure': sensService.getPressure(), 'lat': gpsService.latitude, 'lon': gpsService.longitude}]
+            #pressure = random.randint(800, 1010)
+            data = [{'timestamp': time.time(), 'temp': sensService.getTemp(), 'pressure': pressure, 'lat': gpsService.latitude, 'lon': gpsService.longitude}]
             #data = [{'timestamp': time.time(), 'temp': random.randint(-10,10), 'pressure': pressure, 'lat': 0, 'lon': 0}]
             updateEvent = UpdateCsvEvent('atmData.csv', data)
             sendEvent = SendCsvEvent(22, 868, data)

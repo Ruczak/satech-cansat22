@@ -4,7 +4,7 @@ import asyncio
 from time import time
 
 class RecoveryService(Service):
-    def __init__(self, name: str, buzzerPin: int, freq: float = 523, delay: int = 1800):
+    def __init__(self, name: str, ledPin: int, buzzerPin: int, freq: float = 523, delay: int = 1800):
         Service.__init__(self, name)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(buzzerPin, GPIO.OUT)
@@ -15,6 +15,8 @@ class RecoveryService(Service):
         self.isBuzzing: bool = False
         self.__delay: int = delay
         self.__start: int = time()
+        self.__ledPin = ledPin
+        GPIO.setup(self.__ledPin, GPIO.OUT)
 
     def buzzerStart(self):
         async def buzzing():
@@ -28,6 +30,25 @@ class RecoveryService(Service):
             asyncio.get_running_loop().create_task(buzzing())
             self.isBuzzing = True
             print("Started buzzing...")
+
+    def ledStart(self):
+        async def blinking():
+            for _ in range(3):
+                self.ledOn()
+                await asyncio.sleep(0.1)
+                self.ledOff()
+                await asyncio.sleep(0.1)
+
+            await asyncio.sleep(1)
+
+            while True:
+                self.ledOn()
+                await asyncio.sleep(1)
+                self.ledOff()
+                await asyncio.sleep(1)
+
+        print("Started blinking...")
+        asyncio.get_running_loop().create_task(blinking())
 
     @property
     def seaLvlPressure(self) -> float:
@@ -44,7 +65,12 @@ class RecoveryService(Service):
     def buzzerOn(self):
         self.__buzzer.ChangeFrequency(self.__freq)
         self.__buzzer.start(10)
-    
+
     def buzzerOff(self):
         self.__buzzer.stop()
-        
+
+    def ledOn(self):
+        GPIO.output(self.__ledPin, GPIO.HIGH)
+
+    def ledOff(self):
+        GPIO.output(self.__ledPin, GPIO.LOW)
