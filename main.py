@@ -39,15 +39,16 @@ def main():
     async def readPressureAndTemp():
         sdrService.start("117975k", "950M", "125k", "sdr_data.csv")
 
+        recService.seaLvlPressure = sensService.getPressure()
+
         while True:
             await asyncio.sleep(1)
-            pressure = sensService.getPressure()
             #pressure = random.randint(800, 1010)            
-            data = [{'timestamp': time.time(), 'temp': sensService.getTemp(), 'pressure': sensService.getPressure(), 'lat': gpsService.latitude, 'lon': gpsService.longitude}]
-            #data = [{'timestamp': time.time(), 'temp': random.randint(-10,10), 'pressure': pressure, 'lat': 0, 'lon': 0}]
-            updateEvent = UpdateCsvEvent('atmData.csv', data)
-            sendEvent = SendCsvEvent(22, 868, data)
-            heightEvent = UpdateHeightEvent(pressure)
+            data = {'timestamp': time.time(), 'temp': sensService.getTemp(), 'pressure': sensService.getPressure(), 'lat': gpsService.latitude, 'lon': gpsService.longitude}
+            #data = {'timestamp': time.time(), 'temp': random.randint(-10,10), 'pressure': pressure, 'lat': 0, 'lon': 0}
+            updateEvent = UpdateCsvEvent('atm_data.csv', data)
+            sendEvent = SendCsvEvent(22, 868, tuple(data.values()))
+            heightEvent = UpdateHeightEvent(data['pressure'])
             eventBus.emit('saveTempAndPressure', updateEvent)
             eventBus.emit('sendTempAndPressure', sendEvent)
             eventBus.emit('updateHeight', heightEvent)
@@ -63,8 +64,8 @@ def main():
         print(f"Added data to csv ({e.path}, {e.data})")
 
     async def sendHandler(e: SendCsvEvent):
-        commService.send(e.address, e.freq, e.data)
-        print(f"Sent data to address of ({e.address}, {e.freq} MHz), {e.data}")
+        commService.send(e.address, e.freq, e.row, e.byteFormat)
+        print(f"Sent data to address of ({e.address}, {e.freq} MHz), {e.row}")
         
     eventBus.addListener('saveTempAndPressure', saveFileHandler)
     eventBus.addListener('sendTempAndPressure', sendHandler)

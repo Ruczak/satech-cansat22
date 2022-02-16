@@ -29,18 +29,17 @@ class FileService(Service):
             self.__scope = path
 
     # adds data rows to .csv file specified with path
-    def addToCsv(self, path: str, data: list[dict], delimiter: str = '|') -> None:
+    def addToCsv(self, path: str, row: dict, delimiter: str = ',') -> None:
         writeHeader = not os.path.isfile(path) or os.stat(path).st_size == 0
 
         with open(path, 'a', newline='') as file:
-            fields = data[0].keys()
+            fields = row.keys()
             writer = csv.DictWriter(file, delimiter=delimiter, quotechar="\'", quoting=csv.QUOTE_MINIMAL, fieldnames=fields)
 
             if writeHeader:
                 writer.writeheader()
 
-            for row in data:
-                writer.writerow(row)
+            writer.writerow(row)
 
             file.close()
 
