@@ -3,48 +3,75 @@ import RPi.GPIO as GPIO
 import asyncio
 from time import time
 
+
 class RecoveryService(Service):
-    def __init__(self, name: str, buzzerPin: int, freq: float = 523, delay: int = 1800):
+    def __init__(self, name: str, led_pin: int, buzzer_pin: int, freq: float = 523, delay: int = 1800):
         Service.__init__(self, name)
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(buzzerPin, GPIO.OUT)
-        self.__buzzer = GPIO.PWM(buzzerPin, freq)
+        GPIO.setup(buzzer_pin, GPIO.OUT)
+        self.__buzzer = GPIO.PWM(buzzer_pin, freq)
         self.__freq: float = freq
         self.__height: float = None
-        self.__seaLvlPressure: float = None
-        self.isBuzzing: bool = False
+        self.__ref_pressure: float = None
+        self.is_buzzing: bool = False
         self.__delay: int = delay
         self.__start: int = time()
+        self.__ledPin = led_pin
+        GPIO.setup(self.__ledPin, GPIO.OUT)
 
-    def buzzerStart(self):
+    def buzzer_start(self):
         async def buzzing():
             while True:
-                self.buzzerOn()
+                self.buzzer_on()
                 await asyncio.sleep(1)
-                self.buzzerOff()
+                self.buzzer_off()
                 await asyncio.sleep(3)
 
-        if not self.isBuzzing and self.__delay + self.__start < time() :
+        if not self.is_buzzing and self.__delay + self.__start < time() :
             asyncio.get_running_loop().create_task(buzzing())
-            self.isBuzzing = True
+            self.is_buzzing = True
             print("Started buzzing...")
 
+    def led_start(self):
+        async def blinking():
+            for _ in range(3):
+                self.led_on()
+                await asyncio.sleep(0.1)
+                self.led_off()
+                await asyncio.sleep(0.1)
+
+            await asyncio.sleep(1)
+
+            while True:
+                self.led_on()
+                await asyncio.sleep(1)
+                self.led_off()
+                await asyncio.sleep(1)
+
+        print("Started blinking...")
+        asyncio.get_running_loop().create_task(blinking())
+
     @property
-    def seaLvlPressure(self) -> float:
-        return self.__seaLvlPressure
+    def ref_pressure(self) -> float:
+        return self.__ref_pressure
 
-    @seaLvlPressure.setter
-    def seaLvlPressure(self, value: float):
-        self.__seaLvlPressure = value
+    @ref_pressure.setter
+    def ref_pressure(self, value: float):
+        self.__ref_pressure = value
 
-    def calcHeight(self, pressure):
-        self.__height = 44330 * (1 - pow(pressure / self.__seaLvlPressure, 0.1903)) 
+    def calc_altitude(self, pressure):
+        self.__height = 44330 * (1 - pow(pressure / self.__ref_pressure, 0.1903))
         return self.__height
 
-    def buzzerOn(self):
+    def buzzer_on(self):
         self.__buzzer.ChangeFrequency(self.__freq)
         self.__buzzer.start(10)
-    
-    def buzzerOff(self):
+
+    def buzzer_off(self):
         self.__buzzer.stop()
-        
+
+    def led_on(self):
+        GPIO.output(self.__ledPin, GPIO.HIGH)
+
+    def led_off(self):
+        GPIO.output(self.__ledPin, GPIO.LOW)

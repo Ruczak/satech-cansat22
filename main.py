@@ -10,74 +10,72 @@ from Events.UpdateCsvEvent import UpdateCsvEvent
 from Events.SendCsvEvent import SendCsvEvent
 from Events.UpdateHeightEvent import UpdateHeightEvent
 
-from smbus2 import SMBus
-from bmp280 import BMP280
-
 import asyncio
 import time
 import random
+# noinspection PyUnresolvedReferences
 import RPi.GPIO as GPIO
+
 
 def main():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    
-    eventBus = EventBus()
-    fileService = FileService('File Service', './.cache')
-    commService = CommunicationService('Communication Service', 20)
-    sensService = SensorService('Sensor Service')
-    sdrService = SDRService("SDR Service")
-    gpsService = GPSService("GPS Service")
-    recService = RecoveryService("Recovery Service", 21, delay=5)
-    recService.seaLvlPressure = 1010.00
 
-    async def updateGPS():
-        while True:
-            gpsService.updateLoc()
-            await asyncio.sleep(1)
+    event_bus = EventBus()
+    file_service = FileService('File Service', './.cache')
+    comm_service = CommunicationService('Communication Service', 20)
+    sens_service = SensorService('Sensor Service')
+    sdr_service = SDRService("SDR Service")
+    gps_service = GPSService("GPS Service")
+    rec_service = RecoveryService("Recovery Service", 21, delay=5)
+    rec_service.ref_pressure = 1010.00
 
-    async def readPressureAndTemp():
-        sdrService.start("117975k", "950M", "125k", "sdr_data.csv")
+    async def main_coroutine():
+        sdr_service.start("800M", "1000M", "125k", "sdr_data.csv")
+        gps_service.start()
+        rec_service.led_start()
 
-        recService.seaLvlPressure = sensService.getPressure()
+        rec_service.ref_pressure = sens_service.get_pressure()
+        print("Sea Level Pressure set to:", rec_service.ref_pressure)
 
         while True:
             await asyncio.sleep(1)
-            #pressure = random.randint(800, 1010)            
-            data = {'timestamp': time.time(), 'temp': sensService.getTemp(), 'pressure': sensService.getPressure(), 'lat': gpsService.latitude, 'lon': gpsService.longitude}
-            #data = {'timestamp': time.time(), 'temp': random.randint(-10,10), 'pressure': pressure, 'lat': 0, 'lon': 0}
-            updateEvent = UpdateCsvEvent('atm_data.csv', data)
-            sendEvent = SendCsvEvent(22, 868, tuple(data.values()), "5d")
-            heightEvent = UpdateHeightEvent(data['pressure'])
-            eventBus.emit('saveTempAndPressure', updateEvent)
-            eventBus.emit('sendTempAndPressure', sendEvent)
-            eventBus.emit('updateHeight', heightEvent)
-        
-    async def updateHeightHandler(e: UpdateHeightEvent):
-        height = recService.calcHeight(e.pressure)
-        print(f"Current height: {height}")
+            # pressure = random.randint(800, 1010)
+            data = {'timestamp': time.time(), 'temp': sens_service.get_temp(), 'pressure': sens_service.get_pressure(),
+                    'lat': gps_service.latitude, 'lon': gps_service.longitude}
+            # data = {'timestamp': time.time(), 'temp': random.randint(-10,10), 'pressure': pressure, 'lat': 0,
+            # 'lon': 0}
+            update_event = UpdateCsvEvent('atm_data.csv', data)
+            send_event = SendCsvEvent(22, 868, tuple(data.values()), "5d")
+            altitude_event = UpdateHeightEvent(data['pressure'])
+            event_bus.emit('saveTempAndPressure', update_event)
+            event_bus.emit('sendTempAndPressure', send_event)
+            event_bus.emit('updateAltitude', altitude_event)
+
+    async def altitude_handler(e: UpdateHeightEvent):
+        height = rec_service.calc_altitude(e.pressure)
+        print(f"Current altitude: {height}")
         if height < 500:
-            recService.buzzerStart()
+            rec_service.buzzer_start()
 
-    async def saveFileHandler(e: UpdateCsvEvent):
-        fileService.addToCsv(e.path, e.data)
+    async def save_file_handler(e: UpdateCsvEvent):
+        file_service.add_to_csv(e.path, e.data)
         print(f"Added data to csv ({e.path}, {e.data})")
 
-    async def sendHandler(e: SendCsvEvent):
-        commService.send(e.address, e.freq, e.row, e.byteFormat)
+    async def send_handler(e: SendCsvEvent):
+        comm_service.send(e.address, e.freq, e.row, e.byteFormat)
         print(f"Sent data to address of ({e.address}, {e.freq} MHz), {e.row}")
-        
-    eventBus.addListener('saveTempAndPressure', saveFileHandler)
-    eventBus.addListener('sendTempAndPressure', sendHandler)
-    eventBus.addListener('updateHeight', updateHeightHandler)
+
+    event_bus.add_listener('saveTempAndPressure', save_file_handler)
+    event_bus.add_listener('sendTempAndPressure', send_handler)
+    event_bus.add_listener('updateAltitude', altitude_handler)
 
     try:
-        gpsTask = loop.create_task(updateGPS())
-        loop.run_until_complete(readPressureAndTemp())
+        loop.run_until_complete(main_coroutine())
     except KeyboardInterrupt:
         pass
     finally:
-        sdrService.end()
+        sdr_service.end()
         loop.close()
         GPIO.cleanup()
         print("Closed")

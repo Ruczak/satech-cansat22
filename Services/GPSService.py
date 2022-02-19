@@ -1,5 +1,7 @@
 from gps import *
 from ._Service import Service
+import asyncio
+
 
 class GPSService(Service):
     def __init__(self, name: str):
@@ -8,6 +10,22 @@ class GPSService(Service):
         self.__latitude: float = 0.0
         self.__longitude: float = 0.0
         self.__timestamp: str = 'n/a'
+        self.__task: asyncio.Task = None
+
+    def start(self):
+        async def routine():
+            try:
+                while True:
+                    self.__update()
+                    await asyncio.sleep(1)
+            except asyncio.CancelledError:
+                print("Cancelled GPS Service task.")
+                raise
+
+        self.__task = asyncio.get_running_loop().create_task(routine())
+
+    def end(self):
+        self.__task.cancel()
 
     @property
     def latitude(self):
@@ -21,10 +39,11 @@ class GPSService(Service):
     def timestamp(self):
         return self.__timestamp
 
-    def updateLoc(self):
+    def __update(self):
         report = self.__gps.next()
         if report['class'] == 'TPV':
             self.__latitude = getattr(report,'lat', 0.0)
             self.__longitude = getattr(report,'lon', 0.0)
             self.__timestamp = getattr(report, 'time', 'n/a')
             # print(report)
+

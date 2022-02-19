@@ -29,14 +29,14 @@ class FileService(Service):
             self.__scope = path
 
     # adds data rows to .csv file specified with path
-    def addToCsv(self, path: str, row: dict, delimiter: str = ',') -> None:
-        writeHeader = not os.path.isfile(path) or os.stat(path).st_size == 0
+    def add_to_csv(self, path: str, row: dict, delimiter: str = ',') -> None:
+        write_header = not os.path.isfile(path) or os.stat(path).st_size == 0
 
         with open(path, 'a', newline='') as file:
             fields = row.keys()
             writer = csv.DictWriter(file, delimiter=delimiter, quotechar="\'", quoting=csv.QUOTE_MINIMAL, fieldnames=fields)
 
-            if writeHeader:
+            if write_header:
                 writer.writeheader()
 
             writer.writerow(row)
