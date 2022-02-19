@@ -47,7 +47,7 @@ def main():
             data = {'timestamp': time.time(), 'temp': sensService.getTemp(), 'pressure': sensService.getPressure(), 'lat': gpsService.latitude, 'lon': gpsService.longitude}
             #data = {'timestamp': time.time(), 'temp': random.randint(-10,10), 'pressure': pressure, 'lat': 0, 'lon': 0}
             updateEvent = UpdateCsvEvent('atm_data.csv', data)
-            sendEvent = SendCsvEvent(22, 868, tuple(data.values()))
+            sendEvent = SendCsvEvent(22, 868, tuple(data.values()), "5d")
             heightEvent = UpdateHeightEvent(data['pressure'])
             eventBus.emit('saveTempAndPressure', updateEvent)
             eventBus.emit('sendTempAndPressure', sendEvent)
