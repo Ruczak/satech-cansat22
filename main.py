@@ -28,17 +28,28 @@ async def main():
     rec_service.ref_pressure = 1010.00
 
     async def altitude_handler(e: UpdateHeightEvent):
-        height = rec_service.calc_altitude(e.pressure)
-        print(f"Current altitude: {height}m")
-        if height < 500:
-            rec_service.buzzer_start()
+        try:
+            height = rec_service.calc_altitude(e.pressure)
+            print(f"Current altitude: {height}m")
+            if height < 500:
+                rec_service.buzzer_start()
+        except asyncio.CancelledError:
+            print("Cancelled altitude handler")
+            raise
 
     async def save_file_handler(e: UpdateCsvEvent):
-        file_service.add_to_csv(e.path, e.data)
+        try:
+            file_service.add_to_csv(e.path, e.data)
+        except asyncio.CancelledError:
+            print("Cancelled save file handler.")
+            raise
 
     async def send_handler(e: SendCsvEvent):
-        comm_service.send(e.address, e.freq, e.row, e.byteFormat)
-
+        try:
+            comm_service.send(e.address, e.freq, e.row, e.byteFormat)
+        except asyncio.CancelledError:
+            print("Cancelled send handler.")
+            raise
 
     event_bus.add_listener('saveTempAndPressure', save_file_handler)
     event_bus.add_listener('sendTempAndPressure', send_handler)
