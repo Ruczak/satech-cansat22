@@ -13,6 +13,7 @@
     <option name="namespacePackageFolders">
       <list>
         <option value="$MODULE_DIR$/Services" />
+        <option value="$MODULE_DIR$/Events" />
       </list>
     </option>
   </component>

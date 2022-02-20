@@ -16,40 +16,58 @@ class RecoveryService(Service):
         self.is_buzzing: bool = False
         self.__delay: int = delay
         self.__start: int = time()
-        self.__ledPin = led_pin
-        GPIO.setup(self.__ledPin, GPIO.OUT)
+        self.__buzzing_task: asyncio.Task = None
+
+        self.__led_pin = led_pin
+        GPIO.setup(self.__led_pin, GPIO.OUT)
+        self.__led_task: asyncio.Task = None
 
     def buzzer_start(self):
         async def buzzing():
-            while True:
-                self.buzzer_on()
-                await asyncio.sleep(1)
-                self.buzzer_off()
-                await asyncio.sleep(3)
+            try:
+                while True:
+                    self.buzzer_on()
+                    await asyncio.sleep(1)
+                    self.buzzer_off()
+                    await asyncio.sleep(3)
+            except asyncio.CancelledError:
+                print("Stopped buzzing.")
+                raise
 
         if not self.is_buzzing and self.__delay + self.__start < time() :
-            asyncio.get_running_loop().create_task(buzzing())
             self.is_buzzing = True
+            self.__buzzing_task = asyncio.get_running_loop().create_task(buzzing())
             print("Started buzzing...")
+
+    def buzzer_stop(self):
+        self.__buzzing_task.stop()
 
     def led_start(self):
         async def blinking():
-            for _ in range(3):
-                self.led_on()
-                await asyncio.sleep(0.1)
-                self.led_off()
-                await asyncio.sleep(0.1)
+            try:
+                for _ in range(3):
+                    self.led_on()
+                    await asyncio.sleep(0.1)
+                    self.led_off()
+                    await asyncio.sleep(0.1)
 
-            await asyncio.sleep(1)
+                await asyncio.sleep(1)
 
-            while True:
-                self.led_on()
-                await asyncio.sleep(1)
+                while True:
+                    self.led_on()
+                    await asyncio.sleep(1)
+                    self.led_off()
+                    await asyncio.sleep(1)
+            except asyncio.CancelledError:
+                print("Stopped blinking.")
                 self.led_off()
-                await asyncio.sleep(1)
+                raise
 
         print("Started blinking...")
         asyncio.get_running_loop().create_task(blinking())
+
+    def led_stop(self):
+        self.__led_task.cancel()
 
     @property
     def ref_pressure(self) -> float:
@@ -71,7 +89,7 @@ class RecoveryService(Service):
         self.__buzzer.stop()
 
     def led_on(self):
-        GPIO.output(self.__ledPin, GPIO.HIGH)
+        GPIO.output(self.__led_pin, GPIO.HIGH)
 
     def led_off(self):
-        GPIO.output(self.__ledPin, GPIO.LOW)
+        GPIO.output(self.__led_pin, GPIO.LOW)
