@@ -27,7 +27,7 @@ def main():
     sens_service = SensorService('Sensor Service')
     sdr_service = SDRService("SDR Service")
     gps_service = GPSService("GPS Service")
-    rec_service = RecoveryService("Recovery Service", 21, delay=5)
+    rec_service = RecoveryService("Recovery Service", 26, 21, freq=1397, delay=5)
     rec_service.ref_pressure = 1010.00
 
     async def main_coroutine():
