@@ -43,5 +43,7 @@ class FileService(Service):
 
             file.close()
 
+        print(f"Added data to csv ({path}, {row})")
+
     
 
