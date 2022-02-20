@@ -32,6 +32,7 @@ class RecoveryService(Service):
                     await asyncio.sleep(3)
             except asyncio.CancelledError:
                 print("Stopped buzzing.")
+                self.buzzer_off()
                 raise
 
         if not self.is_buzzing and self.__delay + self.__start < time() :
@@ -40,7 +41,7 @@ class RecoveryService(Service):
             print("Started buzzing...")
 
     def buzzer_stop(self):
-        self.__buzzing_task.stop()
+        self.__buzzing_task.cancel()
 
     def led_start(self):
         async def blinking():
