@@ -35,11 +35,10 @@ async def main():
 
     async def save_file_handler(e: UpdateCsvEvent):
         file_service.add_to_csv(e.path, e.data)
-        print(f"Added data to csv ({e.path}, {e.data})")
 
     async def send_handler(e: SendCsvEvent):
         comm_service.send(e.address, e.freq, e.row, e.byteFormat)
-        print(f"Sent data to address of ({e.address}, {e.freq} MHz), {e.row}")
+
 
     event_bus.add_listener('saveTempAndPressure', save_file_handler)
     event_bus.add_listener('sendTempAndPressure', send_handler)
