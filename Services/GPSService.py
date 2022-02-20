@@ -1,5 +1,6 @@
 from gps import *
 from ._Service import Service
+import os
 import asyncio
 
 
@@ -13,6 +14,12 @@ class GPSService(Service):
         self.__task: asyncio.Task = None
 
     def start(self):
+        exit_code = os.system("sudo stty -F /dev/ttyUSB0 9600")
+        if exit_code == 0:
+            print("Set baud rate of /dev/ttyUSB0 to 9600")
+        else:
+            print(f"Error, could not set baud rate of /dev/ttyUSB0 to 9600 (exit_code: {exit_code})")
+
         async def routine():
             try:
                 while True:
