@@ -26,6 +26,8 @@ async def main():
         rec_service.led_start()
         sens_service.start()
 
+        sdr_sample_count = 0
+
         await asyncio.sleep(1)
 
         rec_service.ref_pressure = sens_service.pressure
@@ -37,13 +39,13 @@ async def main():
             data = {'timestamp': time.time(), 'temp': sens_service.temp, 'pressure': sens_service.pressure,
                     'lat': gps_service.latitude, 'lon': gps_service.longitude}
 
-            asyncio.get_running_loop().create_task(file_service.add_to_csv('atm_data.csv', data))
+            asyncio.get_running_loop().create_task(file_service.write_to_csv('atm_data.csv', data))
             asyncio.get_running_loop().create_task(rec_service.update_altitude(data['pressure']))
-            print("Started sending.")
             await asyncio.get_running_loop().create_task(comm_service.send(22, 868, tuple(data.values()), "5d"))
-            print("Sending done.")
 
-            # sdr_samples = sdr_service.get_samples()
+            sdr_samples = sdr_service.get_samples(512)
+
+            asyncio.get_running_loop().create_task(file_service.write_to_file(f'sdr_data{sdr_sample_count + 1}.txt', str(sdr_samples)))
 
             await timer
     except asyncio.CancelledError:

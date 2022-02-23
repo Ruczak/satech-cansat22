@@ -41,8 +41,8 @@ class FileService(Service):
             print("Cancelled logging into file.")
             raise
 
-    # adds data rows to specified csv file
-    async def add_to_csv(self, path: str, row: dict) -> None:
+    # writes row to specified csv file
+    async def write_to_csv(self, path: str, row: dict) -> None:
         try:
             write_header = not os.path.isfile(path) or os.stat(path).st_size == 0
 
@@ -57,9 +57,18 @@ class FileService(Service):
 
                 file.close()
 
-            print(f"Added data to csv ({path}, {row})")
+            print(f"Written csv data to {path}: {row}")
         except asyncio.CancelledError:
             print("Cancelled writing to csv file.")
             raise
-    
 
+    # writes text to specified file
+    async def write_to_file(self, path: str, text: str, overwrite=False):
+        try:
+            with open(path, 'a' if not overwrite else 'w') as file:
+                file.write(text)
+                print(f"Written text to {path}: {text[:20]} {'... .' if len(text) > 20 else '.'}")
+                file.close()
+        except asyncio.CancelledError:
+            print("Cancelled writing to file.")
+            raise

@@ -1,6 +1,7 @@
 from ._Service import Service
 import subprocess
 import asyncio
+import typing
 from rtlsdr import RtlSdr
 
 
@@ -13,7 +14,7 @@ class SDRService(Service):
         self.__task: asyncio.Task = None
 
     # starts SDR service
-    def start(self, sample_rate: int, center_freq: int, freq_correction=60, gain='auto'):
+    def start(self, sample_rate: float, center_freq: float, freq_correction=60, gain: typing.Any = 'auto'):
         self.__sdr = RtlSdr()
         self.__sdr.sample_rate = sample_rate
         self.__sdr.center_freq = center_freq
