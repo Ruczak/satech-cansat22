@@ -6,7 +6,7 @@ from rtlsdr import RtlSdr
 
 class SDRService(Service):
     def __init__(self, name: str):
-        Service.__init__(name)
+        Service.__init__(self, name)
         # self.__process = None
 
         self.__sdr: RtlSdr = None
