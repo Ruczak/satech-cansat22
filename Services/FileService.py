@@ -6,7 +6,7 @@ import csv
 
 class FileService(Service):
     def __init__(self, name: str, scope: str, log_file='./logs.txt', delimiter=',') -> None:
-        super(FileService, self).__init__(name)
+        Service.__init__(self, name)
         if isinstance(scope, str) and len(scope) > 0:
             if not os.path.isdir(scope):
                 os.mkdir(scope)
