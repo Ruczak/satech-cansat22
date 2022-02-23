@@ -37,8 +37,12 @@ sudo apt-get upgrade
    11. Select **Finish**
 9. Edit config file with:
    1. Type in terminal `sudo nano /boot/config.txt`
-   2. Uncomment (delete # sign) or add this line `dtparam=i2c_arm=on`
-   3. Add this line `dtparam=i2c_vc=on`
+   2Add or uncomment these lines:
+```
+dtparam=i2c_arm=on
+dtparam=i2c_vc=on
+
+```
 10. Install librtlsdr with
  <pre>
 git clone git://git.osmocom.org/rtl-sdr.git
