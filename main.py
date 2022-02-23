@@ -44,8 +44,8 @@ async def main():
             await asyncio.get_running_loop().create_task(comm_service.send(22, 868, tuple(data.values()), "5d"))
 
             sdr_samples = sdr_service.get_samples(512)
-
-            asyncio.get_running_loop().create_task(file_service.write_to_file(f'sdr_data{sdr_sample_count + 1}.txt', str(sdr_samples)))
+            sdr_sample_count = sdr_sample_count + 1
+            asyncio.get_running_loop().create_task(file_service.write_to_file(f'sdr_data{sdr_sample_count}.txt', str(sdr_samples)))
 
             await timer
     except asyncio.CancelledError:
