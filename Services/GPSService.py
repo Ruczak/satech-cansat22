@@ -1,6 +1,5 @@
 from gps import *
 from ._Service import Service
-import subprocess
 import asyncio
 
 
@@ -13,6 +12,7 @@ class GPSService(Service):
         self.__timestamp: str = 'n/a'
         self.__task: asyncio.Task = None
 
+    # starts GPS coroutine
     def start(self):
         async def routine():
             try:
@@ -27,26 +27,29 @@ class GPSService(Service):
         self.__task = asyncio.get_running_loop().create_task(routine())
         print("Started GPS service task.")
 
+    # stops GPS coroutine
     def stop(self):
         self.__task.cancel()
 
+    # gets current latitude
     @property
     def latitude(self):
         return self.__latitude
 
+    # gets current longitude
     @property
     def longitude(self):
         return self.__longitude
 
+    # gets last update timestamp
     @property
     def timestamp(self):
         return self.__timestamp
 
+    # fetches GPS data from GPS device
     def __update(self):
         report = self.__gps.next()
         if report['class'] == 'TPV':
             self.__latitude = getattr(report,'lat', 0.0)
             self.__longitude = getattr(report,'lon', 0.0)
             self.__timestamp = getattr(report, 'time', 'n/a')
-            # print(report)
-

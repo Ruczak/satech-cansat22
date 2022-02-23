@@ -4,11 +4,6 @@ from Services.SensorService import SensorService
 from Services.SDRService import SDRService
 from Services.GPSService import GPSService
 from Services.RecoveryService import RecoveryService
-from EventBus import EventBus
-
-from Events.UpdateCsvEvent import UpdateCsvEvent
-from Events.SendCsvEvent import SendCsvEvent
-from Events.UpdateHeightEvent import UpdateHeightEvent
 
 import asyncio
 import time

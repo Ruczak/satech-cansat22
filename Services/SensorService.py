@@ -24,6 +24,7 @@ class SensorService(Service):
     def temp(self):
         return self.__temp
 
+    # starts sensor coroutine
     def start(self):
         async def routine():
             try:
@@ -39,5 +40,6 @@ class SensorService(Service):
         self.__task = asyncio.get_running_loop().create_task(routine())
         print("Started sensor service task.")
 
+    # stops sensor coroutine
     def stop(self):
         self.__task.cancel()

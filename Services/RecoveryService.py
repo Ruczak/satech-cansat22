@@ -24,6 +24,7 @@ class RecoveryService(Service):
         self.__buzzing_task: asyncio.Task = None
         self.__led_task: asyncio.Task = None
 
+    # starts buzzing coroutine
     def buzzer_start(self):
         async def buzzing():
             try:
@@ -41,9 +42,11 @@ class RecoveryService(Service):
         self.is_buzzing = True
         print(f"Started buzzing (altitude: {self.__altitude} m)")
 
+    # stops buzzing coroutine
     def buzzer_stop(self):
         self.__buzzing_task.cancel()
 
+    # starts led blinking coroutine
     def led_start(self):
         async def blinking():
             try:
@@ -68,17 +71,21 @@ class RecoveryService(Service):
         print("Started blinking...")
         asyncio.get_running_loop().create_task(blinking())
 
+    # stops led blinking coroutine
     def led_stop(self):
         self.__led_task.cancel()
 
+    # gets referential pressure
     @property
     def ref_pressure(self) -> float:
         return self.__ref_pressure
 
+    # sets referential pressure
     @ref_pressure.setter
     def ref_pressure(self, value: float):
         self.__ref_pressure = value
 
+    # updates altitude using pressure
     async def update_altitude(self, pressure):
         try:
             self.__altitude = 44330 * (1 - pow(pressure / self.__ref_pressure, 0.1903))
@@ -89,15 +96,19 @@ class RecoveryService(Service):
             print("Cancelled updating altitude.")
             raise
 
+    # turns buzzer on
     def buzzer_on(self):
         self.__buzzer.ChangeFrequency(self.__freq)
         self.__buzzer.start(10)
 
+    # turns buzzer off
     def buzzer_off(self):
         self.__buzzer.stop()
 
+    # turns led on
     def led_on(self):
         GPIO.output(self.__led_pin, GPIO.HIGH)
 
+    # turns led off
     def led_off(self):
         GPIO.output(self.__led_pin, GPIO.LOW)

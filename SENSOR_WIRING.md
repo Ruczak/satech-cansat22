@@ -1,4 +1,4 @@
-# Sesnor Wiring for Cansat:
+# Wiring for CanSat:
 
 ## Raspberry Pi Zero 2 W - Header Pinout
 
@@ -33,3 +33,15 @@
 - Bus: I2C_0
 - Address: 0x18
 - Voltage: 3.3V
+
+## Buzzer and LED wiring:
+
+### Passive buzzer
+
+- Red (PWR): 40 (GPIO21)
+- Black (GND): 34
+
+### LED
+
+- Cathode (+ / PWR): 37 (GPIO26)
+- Anode (- / GND): 39

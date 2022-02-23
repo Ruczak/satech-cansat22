@@ -1,8 +1,5 @@
 import asyncio
-
 from ._Service import Service
-from EventBus import EventBus
-from Events.UpdateCsvEvent import UpdateCsvEvent
 import os
 import csv
 
@@ -22,17 +19,19 @@ class FileService(Service):
         self.log_file = log_file
         self.delimiter = delimiter
     
-    # defines the scope of the file system, uses current scope as a context
+    # gets current scope of the file system, uses current scope as a context
     @property
     def scope(self) -> str:
         return self.__scope
 
+    # sets current scope of the file system
     @scope.setter
     def scope(self, path: str) -> None:
         if isinstance(path, str) and len(path) > 0:
             os.chdir(path)
             self.__scope = path
 
+    # logs message to file
     async def log(self, message: str):
         try:
             with open(self.log_file, 'a', newline='\r\n') as file:
@@ -42,7 +41,7 @@ class FileService(Service):
             print("Cancelled logging into file.")
             raise
 
-    # adds data rows to .csv file specified with path
+    # adds data rows to specified csv file
     async def add_to_csv(self, path: str, row: dict) -> None:
         try:
             write_header = not os.path.isfile(path) or os.stat(path).st_size == 0

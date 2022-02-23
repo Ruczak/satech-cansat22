@@ -1,4 +1,5 @@
-class Service():   
+class Service:
+    # all running services
     _services = {}
 
     def __init__(self, name: str) -> None:
