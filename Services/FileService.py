@@ -1,3 +1,5 @@
+import asyncio
+
 from ._Service import Service
 from EventBus import EventBus
 from Events.UpdateCsvEvent import UpdateCsvEvent
@@ -6,7 +8,7 @@ import csv
 
 
 class FileService(Service):
-    def __init__(self, name: str, scope: str) -> None:
+    def __init__(self, name: str, scope: str, log_file='./logs.txt', delimiter=',') -> None:
         super(FileService, self).__init__(name)
         if isinstance(scope, str) and len(scope) > 0:
             if not os.path.isdir(scope):
@@ -16,6 +18,9 @@ class FileService(Service):
             self.__scope = scope
         else:
             self.__scope = os.getcwd()
+
+        self.log_file = log_file
+        self.delimiter = delimiter
     
     # defines the scope of the file system, uses current scope as a context
     @property
@@ -28,22 +33,34 @@ class FileService(Service):
             os.chdir(path)
             self.__scope = path
 
+    async def log(self, message: str):
+        try:
+            with open(self.log_file, 'a', newline='\r\n') as file:
+                file.write(message)
+                file.close()
+        except asyncio.CancelledError:
+            print("Cancelled logging into file.")
+            raise
+
     # adds data rows to .csv file specified with path
-    def add_to_csv(self, path: str, row: dict, delimiter: str = ',') -> None:
-        write_header = not os.path.isfile(path) or os.stat(path).st_size == 0
+    async def add_to_csv(self, path: str, row: dict) -> None:
+        try:
+            write_header = not os.path.isfile(path) or os.stat(path).st_size == 0
 
-        with open(path, 'a', newline='') as file:
-            fields = row.keys()
-            writer = csv.DictWriter(file, delimiter=delimiter, quotechar="\'", quoting=csv.QUOTE_MINIMAL, fieldnames=fields)
+            with open(path, 'a', newline='') as file:
+                fields = row.keys()
+                writer = csv.DictWriter(file, delimiter=self.delimiter, quotechar="\'", quoting=csv.QUOTE_MINIMAL, fieldnames=fields)
 
-            if write_header:
-                writer.writeheader()
+                if write_header:
+                    writer.writeheader()
 
-            writer.writerow(row)
+                writer.writerow(row)
 
-            file.close()
+                file.close()
 
-        print(f"Added data to csv ({path}, {row})")
-
+            print(f"Added data to csv ({path}, {row})")
+        except asyncio.CancelledError:
+            print("Cancelled writing to csv file.")
+            raise
     
 
