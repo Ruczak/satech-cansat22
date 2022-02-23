@@ -15,13 +15,13 @@ async def main():
     file_service = FileService('File Service', './.cache')
     comm_service = CommunicationService('Communication Service', 20)
     sens_service = SensorService('Sensor Service')
-    sdr_service = SDRService("SDR Service", 2.048e6, 70e6)
+    sdr_service = SDRService("SDR Service")
     gps_service = GPSService("GPS Service")
     rec_service = RecoveryService("Recovery Service", 26, 21, freq=1397, delay=5)
     rec_service.ref_pressure = 1010.00
 
     try:
-        sdr_service.start("800M", "1000M", "125k", "sdr_data.csv")
+        sdr_service.start(2.048e6, 70e6)
         gps_service.start()
         rec_service.led_start()
         sens_service.start()

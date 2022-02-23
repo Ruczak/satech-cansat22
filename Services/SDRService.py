@@ -5,17 +5,20 @@ from rtlsdr import RtlSdr
 
 
 class SDRService(Service):
-    def __init__(self, name: str, sample_rate: int, center_freq: int, freq_correction = 60, gain = 'auto'):
-        super(SDRService, self).__init__(name)
+    def __init__(self, name: str):
+        Service.__init__(name)
         # self.__process = None
 
+        self.__sdr: RtlSdr = None
+        self.__task: asyncio.Task = None
+
+    # starts SDR service
+    def start(self, sample_rate: int, center_freq: int, freq_correction=60, gain='auto'):
         self.__sdr = RtlSdr()
         self.__sdr.sample_rate = sample_rate
         self.__sdr.center_freq = center_freq
         self.__sdr.freq_correction = freq_correction
         self.__sdr.gain = gain
-
-        self.__task: asyncio.Task = None
 
     # reads sample from the device
     def get_samples(self, sample_count: int):
