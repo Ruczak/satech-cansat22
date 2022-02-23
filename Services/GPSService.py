@@ -16,16 +16,6 @@ class GPSService(Service):
     def start(self):
         async def routine():
             try:
-                delay = asyncio.sleep(1)
-
-                exit_code = subprocess.run("sudo stty -F /dev/ttyUSB0 9600".split(' '))
-                if exit_code == 0:
-                    print("Set baud rate of /dev/ttyUSB0 to 9600")
-                else:
-                    print(f"Error, could not set baud rate of /dev/ttyUSB0 to 9600 (exit_code: {exit_code})")
-
-                await delay
-
                 while True:
                     timer = asyncio.sleep(1)
                     self.__update()
