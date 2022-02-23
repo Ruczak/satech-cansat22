@@ -7,7 +7,6 @@ from Services.RecoveryService import RecoveryService
 
 import asyncio
 import time
-import random
 # noinspection PyUnresolvedReferences
 import RPi.GPIO as GPIO
 
@@ -16,7 +15,7 @@ async def main():
     file_service = FileService('File Service', './.cache')
     comm_service = CommunicationService('Communication Service', 20)
     sens_service = SensorService('Sensor Service')
-    sdr_service = SDRService("SDR Service")
+    sdr_service = SDRService("SDR Service", 2.048e6, 70e6)
     gps_service = GPSService("GPS Service")
     rec_service = RecoveryService("Recovery Service", 26, 21, freq=1397, delay=5)
     rec_service.ref_pressure = 1010.00
@@ -37,16 +36,18 @@ async def main():
 
             data = {'timestamp': time.time(), 'temp': sens_service.temp, 'pressure': sens_service.pressure,
                     'lat': gps_service.latitude, 'lon': gps_service.longitude}
-            # data = {'timestamp': time.time(), 'temp': random.randint(-10,10), 'pressure': random.randint(800,
-            # 1020), 'lat': 0, 'lon': 0}
 
             asyncio.get_running_loop().create_task(file_service.add_to_csv('atm_data.csv', data))
-            asyncio.get_running_loop().create_task(comm_service.send(22, 868, tuple(data.values()), "5d"))
             asyncio.get_running_loop().create_task(rec_service.update_altitude(data['pressure']))
+            print("Started sending.")
+            await asyncio.get_running_loop().create_task(comm_service.send(22, 868, tuple(data.values()), "5d"))
+            print("Sending done.")
+
+            # sdr_samples = sdr_service.get_samples()
 
             await timer
     except asyncio.CancelledError:
-        sdr_service.stop()
+        sdr_service.close()
         sens_service.stop()
         gps_service.stop()
         loop.close()
