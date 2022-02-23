@@ -50,6 +50,6 @@ class GPSService(Service):
     def __update(self):
         report = self.__gps.next()
         if report['class'] == 'TPV':
-            self.__latitude = getattr(report,'lat', 0.0)
-            self.__longitude = getattr(report,'lon', 0.0)
+            self.__latitude = getattr(report, 'lat', 0.0)
+            self.__longitude = getattr(report, 'lon', 0.0)
             self.__timestamp = getattr(report, 'time', 'n/a')
