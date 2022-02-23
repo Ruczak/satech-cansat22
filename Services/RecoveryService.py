@@ -16,6 +16,7 @@ class RecoveryService(Service):
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(buzzer_pin, GPIO.OUT)
         self.__buzzer = GPIO.PWM(buzzer_pin, freq)
+        self.is_buzzing: bool = False
 
         self.__led_pin = led_pin
         GPIO.setup(self.__led_pin, GPIO.OUT)
@@ -37,7 +38,8 @@ class RecoveryService(Service):
                 raise
 
         asyncio.get_running_loop().create_task(buzzing())
-        print(f"Started buzzing (altitude: {self.__altitude})")
+        self.is_buzzing = True
+        print(f"Started buzzing (altitude: {self.__altitude} m)")
 
     def buzzer_stop(self):
         self.__buzzing_task.cancel()
@@ -80,7 +82,7 @@ class RecoveryService(Service):
     async def update_altitude(self, pressure):
         try:
             self.__altitude = 44330 * (1 - pow(pressure / self.__ref_pressure, 0.1903))
-            if self.__altitude < 1000 and self.__delay + self.__start < time() and self.__buzzing_task is None:
+            if self.__altitude < 1000 and self.__delay + self.__start < time() and not self.is_buzzing:
                 self.buzzer_start()
 
         except asyncio.CancelledError:
