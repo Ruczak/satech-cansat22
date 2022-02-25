@@ -4,7 +4,7 @@
 
 <img src="https://i.stack.imgur.com/yHddo.png" height="450px" alt="header pinout" />
 
-## I<sup>2</sup>C Busses:
+## I<sup>2</sup>C buses:
 
 ### I2C_1
 
@@ -22,13 +22,13 @@
 
 ## Sensors
 
-### BMP280 Bosch:
+### BMP280 Bosch
 
 - Bus: I2C_1
 - Address: 0x76
 - Voltage: 3.3V
 
-### MCP9808 Adafruit:
+### MCP9808 Adafruit
 
 - Bus: I2C_0
 - Address: 0x18
