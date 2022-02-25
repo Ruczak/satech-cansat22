@@ -34,7 +34,7 @@ async def main():
         print("Sea Level Pressure set to:", rec_service.ref_pressure)
 
         while True:
-            timer = asyncio.get_running_loop().create_task(asyncio.sleep(0.8))
+            timer = asyncio.get_running_loop().create_task(asyncio.sleep(1))
 
             data = {'timestamp': time.time(), 'temp': sens_service.temp, 'pressure': sens_service.pressure,
                     'lat': gps_service.latitude, 'lon': gps_service.longitude}
