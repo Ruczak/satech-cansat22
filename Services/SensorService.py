@@ -29,7 +29,7 @@ class SensorService(Service):
         async def routine():
             try:
                 while True:
-                    timer = asyncio.sleep(1)
+                    timer = asyncio.get_running_loop().create_task(asyncio.sleep(1))
                     self.__pressure = float(self.__bmp280.get_pressure())
                     self.__temp = float(self.__mcp9808.readTempC())
                     await timer

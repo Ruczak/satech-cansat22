@@ -17,7 +17,7 @@ class GPSService(Service):
         async def routine():
             try:
                 while True:
-                    timer = asyncio.sleep(1)
+                    timer = asyncio.get_running_loop().create_task(asyncio.sleep(1))
                     self.__update()
                     await timer
             except asyncio.CancelledError:
