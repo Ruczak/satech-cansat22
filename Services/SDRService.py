@@ -1,6 +1,4 @@
 from ._Service import Service
-import subprocess
-import asyncio
 import typing
 from rtlsdr import RtlSdr
 
@@ -9,9 +7,7 @@ class SDRService(Service):
     def __init__(self, name: str):
         Service.__init__(self, name)
         # self.__process = None
-
         self.__sdr: RtlSdr = None
-        self.__task: asyncio.Task = None
 
     # starts SDR service
     def start(self, sample_rate: float, center_freq: float, freq_correction=60, gain: typing.Any = 'auto'):
@@ -28,13 +24,3 @@ class SDRService(Service):
     # closes SDR service
     def close(self):
         self.__sdr.close()
-
-    # # opens new RTL_SDR subprocess
-    # def rtl_start(self, freq_min: str, freq_max: str, step: str, file: str):
-    #     self.__process = subprocess.Popen(['rtl_power', '-f', f"{freq_min}:{freq_max}:{step}", file])
-    #
-    # # terminates RTL_SDR subprocess
-    # def rtl_stop(self):
-    #     self.__process.terminate()
-    #     print("Stopped sdr subprocess.")
-
