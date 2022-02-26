@@ -19,7 +19,7 @@ sudo apt-get update
 sudo apt-get upgrade
 ```
 2. Make sure you have python3 (version 3.9 or higher) installed `sudo python3 --version` if not install it.
-3. Install git and required dependencies `sudo apt-get install git python-smbus python-serial gpsd gpsd-clients libusb-1.0-0-dev cmake`
+3. Install git and required dependencies `sudo apt-get install python3-pip git gpsd gpsd-clients libusb-1.0-0-dev cmake`
 4. Copy repo with `git clone https://github.com/Ruczak/satech-cansat22.git`
 5. Install required python libraries `sudo python3 -m pip install RPi.GPIO bmp280 gps smbus2 Adafruit_MCP9808 pyrtlsdr`
 6. Open **Serial Port** and **I<sup>2</sup>C Port** with
