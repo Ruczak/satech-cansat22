@@ -17,6 +17,14 @@ class SDRService(Service):
         self.__sdr.freq_correction = freq_correction
         self.__sdr.gain = gain
 
+    @property
+    def center_freq(self) -> float:
+        return self.__sdr.center_freq
+
+    @center_freq.setter
+    def center_freq(self, value: float):
+        self.__sdr.center_freq = value
+
     # reads sample from the device
     def get_samples(self, sample_count: int):
         return self.__sdr.read_samples(sample_count)

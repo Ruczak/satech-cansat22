@@ -43,9 +43,9 @@ async def main():
             asyncio.get_running_loop().create_task(rec_service.update_altitude(data['pressure']))
             await asyncio.get_running_loop().create_task(comm_service.send(22, 868, tuple(data.values()), "5d"))
 
-            sdr_samples = sdr_service.get_samples(512)
+            sdr_samples = sdr_service.get_samples(256*256)
             sdr_sample_count = sdr_sample_count + 1
-            asyncio.get_running_loop().create_task(file_service.write_to_file(f'sdr_data{sdr_sample_count}.txt', str(time.time()) + " " + str(sdr_samples), overwrite=True))
+            asyncio.get_running_loop().create_task(file_service.write_to_file(f'sdr_data{sdr_sample_count}.txt', f"{time.time()},{sdr_service.center_freq}, {','.join(str(c) for c in sdr_samples)}", overwrite=True))
 
             await timer
     except asyncio.CancelledError:
