@@ -2,6 +2,7 @@ from ._Service import Service
 import os
 import csv
 import asyncio
+import numpy
 
 
 class FileService(Service):
@@ -10,7 +11,7 @@ class FileService(Service):
         if isinstance(scope, str) and len(scope) > 0:
             if not os.path.isdir(scope):
                 os.mkdir(scope)
-            
+
             os.chdir(scope)
             self.__scope = scope
         else:
@@ -18,7 +19,7 @@ class FileService(Service):
 
         self.log_file = log_file
         self.delimiter = delimiter
-    
+
     # gets current scope of the file system, uses current scope as a context
     @property
     def scope(self) -> str:
@@ -48,7 +49,8 @@ class FileService(Service):
 
             with open(path, 'a', newline='') as file:
                 fields = row.keys()
-                writer = csv.DictWriter(file, delimiter=self.delimiter, quotechar="\'", quoting=csv.QUOTE_MINIMAL, fieldnames=fields)
+                writer = csv.DictWriter(file, delimiter=self.delimiter, quotechar="\'", quoting=csv.QUOTE_MINIMAL,
+                                        fieldnames=fields)
 
                 if write_header:
                     writer.writeheader()
@@ -60,6 +62,17 @@ class FileService(Service):
             print(f"Written csv data to {path}: {row}")
         except asyncio.CancelledError:
             print("Cancelled writing to csv file.")
+            raise
+
+    # (special for SDR) writes sdr data
+    async def write_sdr(self, path: str, t: float, center_freq: float, sample: numpy.ndarray):
+        try:
+            with open(path, 'w') as file:
+                file.write(str(t) + "," + str(center_freq) + "," + str(sample.tolist()))
+                print(f"Written sdr data (freq: {center_freq}) to {path}")
+                file.close()
+        except asyncio.CancelledError:
+            print("Cancelled writing to file.")
             raise
 
     # writes text to specified file
