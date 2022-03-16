@@ -6,7 +6,7 @@ from Services.GPSService import GPSService
 from Services.RecoveryService import RecoveryService
 
 import asyncio
-import time
+from time import time
 # noinspection PyUnresolvedReferences
 import RPi.GPIO as GPIO
 
@@ -37,7 +37,7 @@ async def main():
             t = time()
             timer = asyncio.get_running_loop().create_task(asyncio.sleep(1))
 
-            data = {'timestamp': time.time(), 'temp': sens_service.temp, 'pressure': sens_service.pressure,
+            data = {'timestamp': time(), 'temp': sens_service.temp, 'pressure': sens_service.pressure,
                     'lat': gps_service.latitude, 'lon': gps_service.longitude}
 
             asyncio.get_running_loop().create_task(file_service.write_to_csv('atm_data.csv', data))
@@ -47,7 +47,7 @@ async def main():
             sdr_service.center_freq = 100e6 + (sdr_sample_count % 900) * 1e6
             sdr_samples = sdr_service.get_samples(256*512)
             sdr_sample_count = sdr_sample_count + 1
-            asyncio.get_running_loop().create_task(file_service.write_sdr(f"sdr_data{sdr_sample_count}.txt", time(), sdr_samples))
+            asyncio.get_running_loop().create_task(file_service.write_sdr(f"sdr_data{sdr_sample_count}.txt", time(), sdr_service.center_freq ,sdr_samples))
 
             await timer
             print(str(time() - t) + " seconds")
