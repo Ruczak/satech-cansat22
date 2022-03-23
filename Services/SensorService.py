@@ -8,8 +8,8 @@ import asyncio
 class SensorService(Service):
     def __init__(self, name: str):
         Service.__init__(self, name)
-        self.__bmp280 = BMP280(i2c_dev=SMBus(1), i2c_addr=0x76)
-        self.__mcp9808 = MCP9808(address=0x18, busnum=0)
+        self.__bmp280 = BMP280(i2c_dev=SMBus(0), i2c_addr=0x76)
+        self.__mcp9808 = MCP9808(address=0x18, busnum=1)
         self.__pressure: float = 0
         self.__temp: float = 0
         self.__task: asyncio.Task = None

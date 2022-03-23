@@ -45,7 +45,7 @@ async def main():
             await asyncio.get_running_loop().create_task(comm_service.send(22, 868, tuple(data.values()), "5d"))
 
             sdr_service.center_freq = 100e6 + (sdr_sample_count % 900) * 1e6
-            sdr_samples = sdr_service.get_samples(256*512)
+            sdr_samples = sdr_service.get_samples(256*128)
             sdr_sample_count = sdr_sample_count + 1
             asyncio.get_running_loop().create_task(file_service.write_sdr(f"sdr_data{sdr_sample_count}.txt", time(), sdr_service.center_freq ,sdr_samples))
 
