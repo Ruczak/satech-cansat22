@@ -27,14 +27,14 @@ async def main():
         sens_service.start()
 
         sdr_sample_count = 0
-        sdr_max_samples = 2
+        sdr_max_samples = 5000
 
         async def sdr_set_stop():
             try:
                 while True:
                     await asyncio.sleep(5)
                     if sdr_sample_count > sdr_max_samples:
-                        sdr_service.close()
+                        raise asyncio.CancelledError()
             except asyncio.CancelledError:
                 sdr_service.close()
 
