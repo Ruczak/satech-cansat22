@@ -17,7 +17,7 @@ async def main():
     sens_service = SensorService('Sensor Service')
     sdr_service = SDRService("SDR Service")
     gps_service = GPSService("GPS Service")
-    rec_service = RecoveryService("Recovery Service", 26, 21, freq=1397, delay=5)
+    rec_service = RecoveryService("Recovery Service", 26, 21, freq=1397, delay=1800)
     rec_service.ref_pressure = 1010.00
 
     try:
@@ -27,6 +27,13 @@ async def main():
         sens_service.start()
 
         sdr_sample_count = 0
+        sdr_max_samples = 2
+
+        async def sdr_set_stop():
+            if sdr_sample_count > sdr_max_samples:
+                sdr_service.close()
+
+        asyncio.get_running_loop().create_task(sdr_set_stop())
 
         await asyncio.sleep(1)
 
