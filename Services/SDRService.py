@@ -37,6 +37,7 @@ class SDRService(Service):
 
     # closes SDR service
     def close(self):
-        if not self.__is_running:
+        if self.__is_running:
             self.__sdr.close()
             self.__is_running = False
+            print("SDR Service closed.")
