@@ -18,14 +18,15 @@ async def main():
     sdr_service = SDRService("SDR Service")
     gps_service = GPSService("GPS Service")
     rec_service = RecoveryService("Recovery Service", 26, 21, freq=1397, delay=1800)
-    rec_service.ref_pressure = 1010.00
+    rec_service.ref_pressure = 1014.0
 
     try:
-        sdr_service.start(2.048e6, 100e6)
+        sdr_service.start(2.048e6, 126e6)
         gps_service.start()
         rec_service.led_start()
         sens_service.start()
 
+        sdr_frequencies = [126e6, 390e6, 446e6]
         sdr_sample_count = 0
         sdr_max_samples = 5000
 
@@ -57,7 +58,7 @@ async def main():
             await asyncio.get_running_loop().create_task(comm_service.send(22, 868, tuple(data.values()), "5d"))
 
             if sdr_service.is_running:
-                sdr_service.center_freq = 100e6 + (sdr_sample_count % 900) * 1e6
+                sdr_service.center_freq = sdr_frequencies[sdr_sample_count % len(sdr_frequencies)]
                 sdr_samples = sdr_service.get_samples(256*128)
                 sdr_sample_count = sdr_sample_count + 1
                 asyncio.get_running_loop().create_task(file_service.write_sdr(f"sdr_data{sdr_sample_count}.txt", time(), sdr_service.center_freq ,sdr_samples))
